@@ -55,10 +55,126 @@ export default function GameifiedHealthPage() {
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  // Mock prediction data based on your attachment
+  // Load health analysis results from localStorage and handle success message
   useEffect(() => {
-    // This would normally come from your API endpoint
+    // Check URL parameters for success message
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('from') === 'extraction' && urlParams.get('success') === 'true') {
+      setShowSuccessMessage(true);
+      // Auto-hide success message after 5 seconds
+      setTimeout(() => setShowSuccessMessage(false), 5000);
+      // Clean up URL
+      window.history.replaceState({}, '', '/gamified-Section');
+    }
+
+    // Load ML results from localStorage
+    const storedResults = localStorage.getItem('healthAnalysisResults');
+    if (storedResults) {
+      try {
+        const parsedResults = JSON.parse(storedResults);
+        
+        if (parsedResults.mlPredictions && !parsedResults.mlError) {
+          // Convert ML predictions to gamified format
+          interface MLPrediction {
+            illness: string;
+            is_high_risk: boolean;
+            risk_probability: number;
+            model_accuracy: number;
+          }
+          const heartAttackPrediction = parsedResults.mlPredictions.ml_predictions?.find(
+            (pred: MLPrediction) => pred.illness.toLowerCase().includes('heart')
+          );
+          
+          if (heartAttackPrediction) {
+            const gamifiedData: PredictionResults = {
+              heartAttack: {
+                predictedOutcome: heartAttackPrediction.is_high_risk ? 
+                  `High Risk of ${heartAttackPrediction.illness}` : 
+                  `Low Risk of ${heartAttackPrediction.illness}`,
+                probabilityOfHighRisk: heartAttackPrediction.risk_probability,
+                modelAccuracy: heartAttackPrediction.model_accuracy
+              },
+              personalizedRecommendations: {
+                disclaimer: "These recommendations are based on your extracted health data and AI analysis. Please consult a healthcare provider.",
+                tasks: generateRecommendationsFromMLData(parsedResults)
+              }
+            };
+            
+            setPredictionData(gamifiedData);
+            generateDailyTasks();
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Error parsing stored results:', error);
+      }
+    }
+
+    // Fallback to mock data if no real data available
+    loadMockData();
+    generateDailyTasks();
+  }, []);
+
+  // Generate recommendations based on ML data
+  interface MLResults {
+    extractedData?: {
+      smoking?: number;
+      diabetes?: number;
+      total_cholesterol?: number;
+      systolic_bp?: number;
+    };
+    mlPredictions?: {
+      ml_predictions?: {
+        illness: string;
+        is_high_risk: boolean;
+        risk_probability: number;
+        model_accuracy: number;
+      }[];
+      rule_based_assessments?: {
+        potential_illness: string;
+        details: string;
+      }[];
+      mlError?: string;
+    };
+  }
+
+  const generateRecommendationsFromMLData = (results: MLResults) => {
+    const recommendations = [
+      "Improve Your Diet and Stay Active: These are fundamental for lowering risk for many lifestyle diseases."
+    ];
+
+    const extractedData = results.extractedData;
+    
+    if (extractedData?.smoking === 1) {
+      recommendations.push("Quit Smoking: Your inputs indicate you smoke. Quitting is a critical step to lower your risk.");
+    }
+    
+    if (extractedData?.diabetes === 1) {
+      recommendations.push("Manage Diabetes: Careful management of your blood sugar is crucial for reducing complication risks.");
+    }
+
+    if (extractedData?.total_cholesterol && extractedData.total_cholesterol > 200) {
+      recommendations.push("Monitor Cholesterol: Your cholesterol levels may need attention. Consider dietary changes and regular monitoring.");
+    }
+
+    if (extractedData?.systolic_bp && extractedData.systolic_bp > 130) {
+      recommendations.push("Blood Pressure Management: Your blood pressure readings suggest the need for lifestyle modifications.");
+    }
+
+    // Add rule-based assessments if available
+    if (results.mlPredictions?.rule_based_assessments) {
+      results.mlPredictions.rule_based_assessments.forEach((assessment: { potential_illness: string; details: string }) => {
+        recommendations.push(`${assessment.potential_illness}: ${assessment.details}`);
+      });
+    }
+
+    return recommendations;
+  };
+
+  // Fallback mock data function
+  const loadMockData = () => {
     const mockPredictionData: PredictionResults = {
       heartAttack: {
         predictedOutcome: "High Risk of Heart Attack",
@@ -66,7 +182,7 @@ export default function GameifiedHealthPage() {
         modelAccuracy: 90.33
       },
       personalizedRecommendations: {
-        disclaimer: "This is not medical advice. Please consult a healthcare provider.",
+        disclaimer: "These recommendations are generated based on general health guidelines. Please consult a healthcare provider.",
         tasks: [
           "Improve Your Diet and Stay Active: These are fundamental for lowering risk for many lifestyle diseases.",
           "Quit Smoking: Your inputs indicate you smoke. Quitting is a critical step to lower your risk.",
@@ -76,9 +192,9 @@ export default function GameifiedHealthPage() {
         ]
       }
     };
+    
     setPredictionData(mockPredictionData);
-    generateDailyTasks();
-  }, []);
+  };
 
   // Generate personalized daily tasks based on prediction results
   const generateDailyTasks = () => {
@@ -280,6 +396,28 @@ export default function GameifiedHealthPage() {
       {showCelebration && (
         <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
           <div className="text-6xl animate-bounce">🎉</div>
+        </div>
+      )}
+
+      {/* Success Message Banner */}
+      {showSuccessMessage && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-40 max-w-md">
+          <div className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg border border-green-500 flex items-center gap-3 animate-slide-down">
+            <div className="text-xl">✅</div>
+            <div>
+              <div className="font-semibold">Analysis Complete!</div>
+              <div className="text-sm text-green-100">Your health data has been processed and personalized recommendations are ready.</div>
+            </div>
+            <button 
+              onClick={() => setShowSuccessMessage(false)}
+              className="ml-2 text-green-200 hover:text-white transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
       )}
 

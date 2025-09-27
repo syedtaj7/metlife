@@ -120,3 +120,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom animations */
+@keyframes slide-down {
+  from {
+    transform: translateY(-100%) translateX(-50%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) translateX(-50%);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out;
+}

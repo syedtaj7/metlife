@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Critical Illness Prediction Result</title>
+    <style>
+        body { font-family: sans-serif; margin: 2em; }
+        .result-card { border: 1px solid #ccc; border-radius: 8px; padding: 16px; margin-bottom: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.1); }
+        .result-card h2 { margin-top: 0; color: #333; }
+        .high-risk { border-left: 5px solid #d9534f; }
+        .low-risk { border-left: 5px solid #5cb85c; }
+        .suggestions { background-color: #f9f9f9; border-top: 1px solid #eee; padding: 15px; margin-top: 15px; }
+        .suggestions p { margin-top: 0; }
+        .suggestions ul { padding-left: 20px; }
+        .disclaimer { font-size: 0.8em; color: #777; }
+        a { display: inline-block; margin-top: 20px; text-decoration: none; background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Prediction Results</h1>
+    <p class="disclaimer"><strong>Disclaimer:</strong> This is not medical advice. The predictions and assessments below are based on statistical models and general health guidelines. Please consult a healthcare provider for any health concerns.</p>
+
+    <h2>Machine Learning Predictions</h2>
+    {% for prediction in predictions %}
+        <div class="result-card {% if 'High Risk' in prediction.label %}high-risk{% else %}low-risk{% endif %}">
+            <h2>{{ prediction.name }}</h2>
+            <p><strong>Predicted Outcome:</strong> {{ prediction.label }}</p>
+            <p><strong>Probability of High Risk:</strong> {{ prediction.probability|round(2) }}%</p>
+            <p><em>(Model Accuracy: {{ (prediction.accuracy * 100)|round(2) }}%)</em></p>
+            {% if 'High Risk' in prediction.label %}
+                <div class="suggestions">
+                    <p>A high-risk prediction suggests that several factors may be contributing. Review the individual health metrics below for specific areas of concern and recommendations.</p>
+                </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <h2>Individual Health Metrics</h2>
+    {% for item in assessments %}
+        <div class="result-card {{ item.status }}">
+            <h2>{{ item.name }}</h2>
+            <p><strong>Your Value:</strong> {{ item.value }}</p>
+            <p><strong>Assessment:</strong> {{ item.label }}</p>
+            <div class="suggestions">
+                <p><strong>Recommendation:</strong> {{ item.recommendation }}</p>
+            </div>
+        </div>
+    {% else %}
+        <p>No individual assessments could be performed. Please ensure you entered values for cholesterol, blood pressure, etc.</p>
+    {% endfor %}
+
+    <a href="/">Run a New Prediction</a>
+</body>
+</html>

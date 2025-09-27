@@ -11,6 +11,7 @@ interface ExtractedData {
   total_pages: number;
   structured_data: {
     user_id: string | null; // User email address
+    age: number | null; // Age in years
     sex: number | null; // 0 = Female, 1 = Male
     total_cholesterol: number | null; // mg/dL
     ldl: number | null; // mg/dL
@@ -25,6 +26,29 @@ interface ExtractedData {
     page_number: number;
     text: string;
   }>;
+}
+
+interface MLPrediction {
+  illness: string;
+  is_high_risk: boolean;
+  risk_probability: number;
+  model_accuracy: number;
+}
+
+interface RuleBasedAssessment {
+  risk_factor: string;
+  potential_illness: string;
+  details: string;
+}
+
+interface ProcessedData {
+  extracted_data: ExtractedData['structured_data'];
+  ml_predictions: {
+    user_id: string;
+    ml_predictions: MLPrediction[];
+    rule_based_assessments: RuleBasedAssessment[];
+  } | null;
+  ml_error: string | null;
 }
 
 export default function DataExtraction() {
@@ -56,20 +80,21 @@ export default function DataExtraction() {
     const file = e.target.files?.[0];
     if (file) {
       if (file.type !== 'application/pdf') {
-        alert('Please select a PDF file only.');
+        setError('Please select a PDF file only.');
         return;
       }
       if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        alert('File size should be less than 10MB.');
+        setError('File size should be less than 10MB.');
         return;
       }
+      setError(null); // Clear any previous errors
       setUploadedFile(file);
     }
   };
 
   const handleExtractData = async () => {
     if (!uploadedFile) {
-      alert('Please upload a PDF file first.');
+      setError('Please upload a PDF file first.');
       return;
     }
 
@@ -92,11 +117,11 @@ export default function DataExtraction() {
 
       const result = await response.json();
       
-      // Send extracted RiskModel data to your endpoint
+      // Store data and redirect to gamified section
       await sendRiskModelData(result.data.structured_data);
       
-      console.log('Extracted data:', result.data);
-      alert('Data extraction completed successfully and sent to processing endpoint!');
+      // Redirect to gamified section with success
+      router.push('/gamified-Section?from=extraction&success=true');
       
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
@@ -104,7 +129,7 @@ export default function DataExtraction() {
       setError(errorMessage);
       
       if (errorMessage.includes('service is not running')) {
-        alert(
+        setError(
           'PDF extraction service is not running.\n\n' +
           'To start it:\n' +
           '1. Open a new terminal\n' +
@@ -113,7 +138,7 @@ export default function DataExtraction() {
           'Then try extracting again.'
         );
       } else {
-        alert(`Extraction failed: ${errorMessage}`);
+        setError(`Extraction failed: ${errorMessage}`);
       }
     } finally {
       setExtracting(false);
@@ -136,6 +161,7 @@ export default function DataExtraction() {
         },
         body: JSON.stringify({
           user_id: user?.email || null, // User email ID
+          age: riskData.age, // Include age if extracted
           sex: riskData.sex,
           total_cholesterol: riskData.total_cholesterol,
           ldl: riskData.ldl,
@@ -157,12 +183,29 @@ export default function DataExtraction() {
       }
 
       const result = await response.json();
-      console.log('Risk data sent successfully:', result);
+      console.log('Risk data processed successfully:', result);
+      
+      // Store ML predictions and extracted data for gamified section
+      const gameData = {
+        extractedData: riskData,
+        mlPredictions: result.data.ml_predictions,
+        mlError: result.data.ml_error,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Store in localStorage for gamified section
+      localStorage.setItem('healthAnalysisResults', JSON.stringify(gameData));
       
     } catch (error) {
-      console.error('Failed to send risk data:', error);
-      // Don't throw error here to avoid interrupting the main flow
-      alert('Warning: Data extracted but failed to send to processing endpoint. Please try again.');
+      console.error('Failed to process risk data:', error);
+      // Store error for gamified section
+      const gameData = {
+        extractedData: riskData,
+        mlPredictions: null,
+        mlError: 'Failed to get ML predictions: ' + (error instanceof Error ? error.message : 'Unknown error'),
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('healthAnalysisResults', JSON.stringify(gameData));
     }
   };
 

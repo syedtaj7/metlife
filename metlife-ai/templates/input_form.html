@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Heart Attack Risk Prediction</title>
+</head>
+<body>
+<h2>Enter Your Details for Heart Attack Risk Prediction</h2>
+<form action="/predict" method="post">
+    {% for feature in features %}
+        <label for="{{ feature }}">{{ feature.replace('_', ' ')|title }}:</label><br>
+        {% if feature in ['smoking', 'diabetes'] %}
+            <select id="{{ feature }}" name="{{ feature }}">
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+            </select><br><br>
+        {% elif feature == 'sex' %}
+            <select id="{{ feature }}" name="{{ feature }}">
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+            </select><br><br>
+        {% elif feature == 'age' %}
+            <input type="text" id="{{ feature }}" name="{{ feature }}" placeholder="e.g., 55"><br><br>
+        {% elif 'bp' in feature %}
+            <input type="text" id="{{ feature }}" name="{{ feature }}" placeholder="e.g., 120"><br><br>
+        {% else %}
+            <input type="text" id="{{ feature }}" name="{{ feature }}" placeholder="e.g., 210.5"><br><br>
+        {% endif %}
+    {% endfor %}
+    <button type="submit">Predict Risk</button>
+</form>
+</body>
+</html>
