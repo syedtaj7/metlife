@@ -296,6 +296,30 @@ export default function DataExtraction() {
 
         </div>
       </div>
+
+      {/* Floating Navigation Button - Bottom Right */}
+      <button
+        onClick={() => router.push('/gamified-Section')}
+        className="fixed bottom-6 right-6 bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 z-50 group"
+        title="Go to Gamified Health Page"
+        aria-label="Navigate to gamified health page"
+      >
+        <svg 
+          width="24" 
+          height="24" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          className="transition-transform group-hover:rotate-12"
+        >
+          <path 
+            d="M12 2L13.09 8.26L17 7L15.74 10.74L20 12L15.74 13.26L17 17L13.09 15.74L12 22L10.91 15.74L7 17L8.26 13.26L4 12L8.26 10.74L7 7L10.91 8.26L12 2Z" 
+            fill="currentColor"
+          />
+        </svg>
+        <span className="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          Navigate
+        </span>
+      </button>
     </div>
   );
 }
