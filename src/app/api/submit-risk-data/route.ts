@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 interface RiskModelData {
-  user_id: string | null;
+  user_id: string | null; // User email address
   sex: number | null;
   total_cholesterol: number | null;
   ldl: number | null;
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!riskData.user_id) {
       return NextResponse.json(
-        { error: 'User ID is required' },
+        { error: 'User email is required' },
         { status: 400 }
       );
     }
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     if (EXTERNAL_ENDPOINT === 'YOUR_ENDPOINT_URL_HERE') {
       // For now, just log the data and return success
       console.log('=== RISK MODEL DATA ===');
-      console.log('User ID:', riskData.user_id);
+      console.log('User Email:', riskData.user_id);
       console.log('Sex:', riskData.sex === 1 ? 'Male' : riskData.sex === 0 ? 'Female' : 'Not specified');
       console.log('Total Cholesterol:', riskData.total_cholesterol ? `${riskData.total_cholesterol} mg/dL` : 'Not found');
       console.log('LDL:', riskData.ldl ? `${riskData.ldl} mg/dL` : 'Not found');

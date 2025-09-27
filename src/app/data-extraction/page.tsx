@@ -10,7 +10,7 @@ interface ExtractedData {
   full_text: string;
   total_pages: number;
   structured_data: {
-    user_id: number | null;
+    user_id: string | null; // User email address
     sex: number | null; // 0 = Female, 1 = Male
     total_cholesterol: number | null; // mg/dL
     ldl: number | null; // mg/dL
@@ -135,7 +135,7 @@ export default function DataExtraction() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          user_id: user?.uid || null, // Firebase user ID
+          user_id: user?.email || null, // User email ID
           sex: riskData.sex,
           total_cholesterol: riskData.total_cholesterol,
           ldl: riskData.ldl,

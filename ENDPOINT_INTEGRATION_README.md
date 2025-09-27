@@ -6,7 +6,7 @@ This system extracts cardiovascular risk assessment data from PDF medical report
 
 ```typescript
 interface RiskModelData {
-  user_id: string | null;           // Firebase user ID
+  user_id: string | null;           // User email address
   sex: number | null;               // 0 = Female, 1 = Male
   total_cholesterol: number | null; // mg/dL
   ldl: number | null;               // mg/dL (Low-density lipoprotein)
@@ -45,7 +45,7 @@ const EXTERNAL_ENDPOINT = 'https://your-api-domain.com/api/risk-assessment';
 ### Sample Request Body
 ```json
 {
-  "user_id": "firebase_user_123",
+  "user_id": "user@example.com",
   "sex": 1,
   "total_cholesterol": 220.5,
   "ldl": 140.2,
@@ -80,7 +80,7 @@ The system uses sophisticated regex patterns to identify:
 
 ### Demographics
 - **Sex/Gender**: "male", "female", "M", "F" patterns
-- **Patient ID**: Uses Firebase user ID
+- **Patient Email**: Uses Firebase authenticated user's email address
 
 ### Lab Values  
 - **Total Cholesterol**: "total cholesterol: 220 mg/dL"
@@ -125,7 +125,7 @@ The system uses sophisticated regex patterns to identify:
 The system logs all extracted data:
 ```
 === RISK MODEL DATA ===
-User ID: firebase_user_123
+User Email: user@example.com
 Sex: Male
 Total Cholesterol: 220.5 mg/dL
 LDL: 140.2 mg/dL
