@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import SplitText from '@/components/SplitText';
 import { signUpWithEmail, signInWithGoogle } from '@/lib/firebase';
 
 export default function Login() {
@@ -158,9 +159,18 @@ export default function Login() {
         
         {/* Content */}
         <div className="absolute left-16 top-1/2 -translate-y-1/2 z-10 text-white">
-          <h1 className="text-4xl md:text-5xl font-light mb-4 leading-tight text-purple-800">
-            Improving life one step at a time
-          </h1>
+          <SplitText 
+            text="Improving life one step at a time"
+            tag="h1"
+            className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
+            textAlign="left"
+            splitType="words, chars"
+            delay={50}
+            duration={0.8}
+            from={{ opacity: 0, y: 50, rotationX: -90 }}
+            to={{ opacity: 1, y: 0, rotationX: 0 }}
+            ease="back.out(1.7)"
+          />
         </div>
       </div>
 
@@ -168,9 +178,18 @@ export default function Login() {
       <div className="flex-1 bg-slate-900 flex items-center justify-center p-8">
         <div className="w-full max-w-md space-y-6">
           <div className="text-center">
-            <h2 className="text-3xl font-light text-white mb-2">
-              Create an account
-            </h2>
+            <SplitText 
+              text="Create an account"
+              tag="h2"
+              className="text-3xl font-bold text-white mb-2"
+              textAlign="center"
+              splitType="chars"
+              delay={30}
+              duration={0.6}
+              from={{ opacity: 0, scale: 0.5, y: 20 }}
+              to={{ opacity: 1, scale: 1, y: 0 }}
+              ease="power2.out"
+            />
             <p className="text-slate-400">
               Already have an account?{' '}
               <Link href="/login" className="text-white underline hover:no-underline">

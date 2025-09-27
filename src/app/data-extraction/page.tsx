@@ -278,7 +278,7 @@ export default function DataExtraction() {
                         <path d="M12 3v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         <path d="M12 15v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       </svg>
-                      Extract Data
+                      Analyse Data
                     </>
                   )}
                 </button>

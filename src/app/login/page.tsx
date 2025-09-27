@@ -88,7 +88,7 @@ export default function LoginPage() {
           <SplitText 
             text="Improving life one step at a time"
             tag="h1"
-            className="text-4xl md:text-5xl font-light mb-4 leading-tight"
+            className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
             textAlign="left"
             splitType="words, chars"
             delay={50}
@@ -107,7 +107,7 @@ export default function LoginPage() {
             <SplitText 
               text="Welcome back"
               tag="h2"
-              className="text-3xl font-light text-white mb-2"
+              className="text-3xl font-bold text-white mb-2"
               textAlign="center"
               splitType="chars"
               delay={30}
