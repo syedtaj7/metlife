@@ -86,12 +86,24 @@ export default function LoginPage() {
         {/* Content */}
         <div className="absolute left-16 top-1/2 -translate-y-1/2 z-10 text-white">
           <SplitText 
-            text="Improving life one step at a time"
+            text="Improving Life"
             tag="h1"
-            className="text-4xl md:text-5xl font-bold mb-4 leading-tight"
+            className="text-4xl md:text-5xl font-bold mb-2 leading-tight"
             textAlign="left"
             splitType="words, chars"
             delay={50}
+            duration={0.8}
+            from={{ opacity: 0, y: 50, rotationX: -90 }}
+            to={{ opacity: 1, y: 0, rotationX: 0 }}
+            ease="back.out(1.7)"
+          />
+          <SplitText 
+            text="One Step At a Time"
+            tag="h1"
+            className="text-4xl md:text-5xl font-bold leading-tight"
+            textAlign="left"
+            splitType="words, chars"
+            delay={100}
             duration={0.8}
             from={{ opacity: 0, y: 50, rotationX: -90 }}
             to={{ opacity: 1, y: 0, rotationX: 0 }}
